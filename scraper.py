@@ -24,13 +24,13 @@ driver = webdriver.Chrome(PATH)
 driver.get("https://www.loopnet.com/")
 print(driver.title)
 
+# for row in range(1, sheet.max_row + 1):
 
-for row in range(1, sheet.max_row + 1):
+for row in range(1, 5):
     print(df[['prop_locat', 'Market_Status']])
     property = sheet.cell(row=row+1, column=22).value
     property = property + ' utah'
 
-    # search = driver.find_element('name', 'geography')
     search = WebDriverWait(driver, 10).until(
     EC.presence_of_element_located((By.NAME, 'geography'))
     )
@@ -39,32 +39,41 @@ for row in range(1, sheet.max_row + 1):
     time.sleep(4)
     search.send_keys(Keys.RETURN)
     search.submit
-
     try:
-        content = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.CSS_SELECTOR, 'p.nearby-results__text strong'))
-        )
-        if content.text == 'Your search did not match any properties, but here are some nearby.':
-            results = content.text
-            df.at[row, 'Market_Status'] = 'Not for sale'
-            print(f"{property} is not for sale.")
-        else:
-            print('Oooops')
+        try:
+            content = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, 'p.nearby-results__text strong'))
+            )
+            if content.text == 'Your search did not match any properties, but here are some nearby.':
+                results = content.text
+                df.at[row - 1, 'Market_Status'] = 'Not for sale'
+                print(f"{property} is not for sale.")
+                content = driver.find_element(By.CSS_SELECTOR, '.main-header .logo').click()
+            else:
+                print('Oooops')
 
+        except:
+            content = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, '.profile-hero-wrapper .profile-hero-title'))
+            )
+            df.at[row - 1, 'Market_Status'] = 'FOR SALE'
+            print(content.text)
+            print(f"{property} is for sale!.")
+            content = driver.find_element(By.CSS_SELECTOR, '.ldp-header .ln-logo .logo-default').click()
+
+        try:
+            content = driver.find_element(By.CSS_SELECTOR, '.ldp-header .ln-logo').click()
+            print('second TRY')
+
+        except:
+            print('second EXCEPT')
     except:
-        print(f"{property} FAILED.")
+        print('Everything you tried failed')
+        content = driver.find_element(By.CSS_SELECTOR, '.main-header .logo img.logo-default, .main-header.default .logo img.logo-default').click()
 
-    try:
-        content = driver.find_element(By.CSS_SELECTOR, '.ldp-header .ln-logo').click()
-        print('second TRY')
+print(df[['prop_locat', 'Market_Status']])
 
-    except:
-        print('second EXCEPT')
-
-    # This clicks the logo to return to search field
-    
-    content = driver.find_element(By.CSS_SELECTOR, '.main-header .logo').click()
-
+df.to_csv (r'C:\Users\aalon\OneDrive\Desktop\python\crawler\export_dataframe.csv', index = None, header=True) 
     
 
 
