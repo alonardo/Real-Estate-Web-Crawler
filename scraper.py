@@ -7,6 +7,10 @@ import time
 import openpyxl
 from selenium.webdriver.common.by import By
 import pandas as pd
+import numpy as np
+
+df = pd.read_excel(r'C:\Users\aalon\OneDrive\Desktop\python\crawler\targets.xlsx')
+df['Market_Status'] = np.nan
 
 book = openpyxl.load_workbook(r'C:\Users\aalon\OneDrive\Desktop\python\crawler\targets.xlsx')
 sheet = book.active
@@ -22,27 +26,44 @@ print(driver.title)
 
 
 for row in range(1, sheet.max_row + 1):
+    print(df[['prop_locat', 'Market_Status']])
     property = sheet.cell(row=row+1, column=22).value
-    # property = property + ' utah'
+    property = property + ' utah'
 
-    search = driver.find_element('name', 'geography')
+    # search = driver.find_element('name', 'geography')
+    search = WebDriverWait(driver, 10).until(
+    EC.presence_of_element_located((By.NAME, 'geography'))
+    )
+
     search.send_keys(property)
     time.sleep(4)
     search.send_keys(Keys.RETURN)
     search.submit
+
     try:
-        # This checks to see if the property is on the market
-        content = driver.find_element(By.CSS_SELECTOR, 'p.nearby-results__text strong')
-        results = content.text
-        print(property + '*******' + results)
+        content = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, 'p.nearby-results__text strong'))
+        )
+        if content.text == 'Your search did not match any properties, but here are some nearby.':
+            results = content.text
+            df.at[row, 'Market_Status'] = 'Not for sale'
+            print(f"{property} is not for sale.")
+        else:
+            print('Oooops')
 
     except:
-        print('Property found!')
+        print(f"{property} FAILED.")
+
+    try:
         content = driver.find_element(By.CSS_SELECTOR, '.ldp-header .ln-logo').click()
-        
-    finally:
-        # This clicks the logo to return to search field
-        content = driver.find_element(By.CSS_SELECTOR, '.main-header .logo').click()
+        print('second TRY')
+
+    except:
+        print('second EXCEPT')
+
+    # This clicks the logo to return to search field
+    
+    content = driver.find_element(By.CSS_SELECTOR, '.main-header .logo').click()
 
     
 
