@@ -26,7 +26,7 @@ print(driver.title)
 
 # for row in range(1, sheet.max_row + 1):
 
-for row in range(1, 5):
+for row in range(1, sheet.max_row):
     print(df[['prop_locat', 'Market_Status']])
     property = sheet.cell(row=row+1, column=22).value
     property = property + ' utah'
