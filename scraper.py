@@ -14,10 +14,6 @@ df['Market_Status'] = np.nan
 
 book = openpyxl.load_workbook(r'C:\Users\aalon\OneDrive\Desktop\python\crawler\targets.xlsx')
 sheet = book.active
-v12 = sheet['V12']
-v13 = sheet['V13']
-x = v12.value
-
 
 PATH = 'C:\Program Files (x86)\chromedriver.exe'
 driver = webdriver.Chrome(PATH)
@@ -36,7 +32,6 @@ for row in range(1, sheet.max_row):
     )
 
     search.send_keys(property)
-    time.sleep(4)
     search.send_keys(Keys.RETURN)
     search.submit
     try:

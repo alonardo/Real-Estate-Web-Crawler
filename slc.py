@@ -22,4 +22,22 @@ search = WebDriverWait(driver, 10).until(
 EC.presence_of_element_located((By.CSS_SELECTOR, '.jimu-widget-attributetable-switch.close'))
 ).click()
 
+search = WebDriverWait(driver, 10).until(
+EC.presence_of_element_located((By.ID, 'dijit_layout_TabContainer_0_tablist_dijit_layout_ContentPane_7'))
+).click()
+
+parcel_table = WebDriverWait(driver, 10).until(
+EC.presence_of_element_located((By.ID, 'dgrid_0'))
+)
+
+print(parcel_table.text)
+
+table_row = WebDriverWait(driver, 10).until(
+EC.presence_of_element_located((By.ID, 'dgrid_1-row-156681'))
+)
+
+print(table_row.text)
+
+time.sleep(5)
+
 
